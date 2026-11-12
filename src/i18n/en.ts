@@ -233,6 +233,7 @@ export const en = {
     linkedin: 'LinkedIn',
     github: 'GitHub',
     email: 'Email',
+    newTab: 'opens in a new tab',
     placeholder: 'Link coming soon',
     built: 'Built with Astro. No cookies, no tracking.',
     updated: 'Last updated',

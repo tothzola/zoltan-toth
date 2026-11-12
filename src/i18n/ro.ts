@@ -226,6 +226,7 @@ export const ro: Dictionary = {
     linkedin: 'LinkedIn',
     github: 'GitHub',
     email: 'E-mail',
+    newTab: 'se deschide într-o filă nouă',
     placeholder: 'Linkul urmează',
     built: 'Construit cu Astro. Fără cookie-uri, fără urmărire.',
     updated: 'Ultima actualizare',
