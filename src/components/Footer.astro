@@ -1,0 +1,51 @@
+---
+import RainBackground from './RainBackground.astro';
+import { site } from '../data/site';
+import type { Dictionary, Locale } from '../i18n';
+
+interface Props {
+  lang: Locale;
+  dict: Dictionary;
+}
+
+const { lang, dict } = Astro.props;
+const footer = dict.footer;
+const contacts = [
+  { label: footer.linkedin, href: site.links.linkedin },
+  { label: footer.github, href: site.links.github },
+  { label: footer.email, href: site.links.email ? `mailto:${site.links.email}` : '' },
+];
+const updated = new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }).format(new Date());
+---
+
+<footer id="contact" class="site-footer">
+  {site.codeRain && <RainBackground />}
+  <div class="wrap">
+    <h2>{footer.title}</h2>
+    <p class="section-intro">{footer.text}</p>
+
+    <ul class="contact-list">
+      {
+        contacts.map((contact) => (
+          <li>
+            {contact.href ? (
+              <a class="btn" href={contact.href} rel="me noopener">
+                {contact.label}
+              </a>
+            ) : (
+              <span class="btn is-placeholder" title={footer.placeholder}>
+                {contact.label}
+              </span>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="footer-note">
+      {footer.built}
+      <span aria-hidden="true">·</span>
+      {footer.updated}: {updated}
+    </p>
+  </div>
+</footer>

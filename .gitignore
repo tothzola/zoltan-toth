@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+
+# Local-only: names that must never appear on the public site (see scripts/check-privacy.mjs)
+.private/
+
+# Full-resolution originals; only the optimised copy in public/ is published
+images/
+
+# Local tooling
+.claude/
+
+# Local-only files kept off the public repo
+/README.md
+/scripts/
+.DS_Store

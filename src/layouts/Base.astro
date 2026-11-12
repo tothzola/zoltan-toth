@@ -1,0 +1,121 @@
+---
+import '../styles/global.css';
+import '../styles/flow.css';
+import { base, dictionaries, locales, localeUrl, type Dictionary, type Locale } from '../i18n';
+
+interface Props {
+  lang: Locale;
+  dict: Dictionary;
+}
+
+const { lang, dict } = Astro.props;
+const absolute = (path: string) => (Astro.site ? new URL(path, Astro.site).href : undefined);
+const canonical = absolute(localeUrl(lang));
+const others = locales.filter((locale) => locale !== lang);
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{dict.meta.title}</title>
+    <meta name="description" content={dict.meta.description} />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {
+      Astro.site &&
+        locales.map((locale) => <link rel="alternate" hreflang={locale} href={absolute(localeUrl(locale))} />)
+    }
+    {Astro.site && <link rel="alternate" hreflang="x-default" href={absolute(localeUrl('en'))} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={dict.meta.title} />
+    <meta property="og:description" content={dict.meta.description} />
+    <meta property="og:locale" content={lang} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        var theme;
+        try {
+          theme = localStorage.getItem('theme');
+        } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        root.dataset.theme = theme;
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{dict.nav.skip}</a>
+    <slot />
+
+    <div class="lang-suggest" data-lang-suggest-bar hidden>
+      {
+        others.map((locale) => (
+          <a href={localeUrl(locale)} lang={locale} hreflang={locale} data-lang-suggest={locale} data-lang-link hidden>
+            {dictionaries[locale].suggest} <span aria-hidden="true">→</span>
+          </a>
+        ))
+      }
+      <button type="button" class="lang-suggest-close" data-lang-suggest-close aria-label={dict.dismiss}>
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+
+    <script>
+      // Choosing a language opens that page at the top and turns the suggestion off for good.
+      const KEY = 'lang-chosen';
+      const remember = () => {
+        try {
+          localStorage.setItem(KEY, '1');
+        } catch {}
+      };
+
+      document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((link) => {
+        link.addEventListener('click', remember);
+      });
+
+      // Offer the visitor's own language once. Never redirect.
+      const bar = document.querySelector<HTMLElement>('[data-lang-suggest-bar]');
+      let chosen = false;
+      try {
+        chosen = localStorage.getItem(KEY) === '1';
+      } catch {}
+      if (bar && !chosen) {
+        const preferred = (navigator.languages?.[0] ?? navigator.language ?? '').slice(0, 2).toLowerCase();
+        const match = bar.querySelector<HTMLElement>(`[data-lang-suggest="${preferred}"]`);
+        if (match && preferred !== document.documentElement.lang) {
+          match.hidden = false;
+          bar.hidden = false;
+        }
+        bar.querySelector('[data-lang-suggest-close]')?.addEventListener('click', () => {
+          bar.hidden = true;
+          remember();
+        });
+      }
+
+      // Scroll reveal. Content stays visible if anything here is unavailable.
+      const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -10% 0px' },
+        );
+        targets.forEach((el) => observer.observe(el));
+      } else {
+        targets.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>

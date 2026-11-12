@@ -1,0 +1,14 @@
+---
+// The Start and End nodes of the page workflow.
+interface Props {
+  kind: 'start' | 'end';
+  label: string;
+}
+
+const { kind, label } = Astro.props;
+---
+
+<p class:list={['flow-terminal', `flow-terminal--${kind}`]} data-flow-step>
+  <span class="flow-terminal-dot" aria-hidden="true"></span>
+  <span class="flow-terminal-label">{label}</span>
+</p>

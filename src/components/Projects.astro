@@ -1,0 +1,33 @@
+---
+import FlowLink from './FlowLink.astro';
+import ProjectCard from './ProjectCard.astro';
+import { projects } from '../data/projects';
+import type { Dictionary } from '../i18n';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { dict } = Astro.props;
+const copy = dict.projects;
+// The first project stays on the main line; the rest run in parallel lanes.
+const [featured, ...rest] = projects;
+---
+
+<section id="projects" class="section" aria-labelledby="projects-title">
+  <div class="wrap">
+    <div class="flow-title">
+      <h2 id="projects-title">{copy.title}</h2>
+      <p class="section-intro">{copy.intro}</p>
+    </div>
+
+    <FlowLink />
+    <ProjectCard project={featured} dict={dict} as="div" featured />
+    <FlowLink />
+
+    <div class="flow-decision" data-flow-step aria-hidden="true"><span class="flow-diamond"></span></div>
+    <ul class="flow-lanes">
+      {rest.map((project) => <ProjectCard project={project} dict={dict} />)}
+    </ul>
+  </div>
+</section>

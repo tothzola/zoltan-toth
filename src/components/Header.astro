@@ -1,0 +1,75 @@
+---
+import { site } from '../data/site';
+import { dictionaries, locales, localeUrl, type Dictionary, type Locale } from '../i18n';
+
+interface Props {
+  lang: Locale;
+  dict: Dictionary;
+}
+
+const { lang, dict } = Astro.props;
+const sections = [
+  { id: 'about', label: dict.nav.about },
+  { id: 'roadmap', label: dict.nav.roadmap },
+  { id: 'projects', label: dict.nav.projects },
+  { id: 'technologies', label: dict.nav.technologies },
+];
+---
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href={localeUrl(lang)} aria-label={dict.name}>{site.initials}</a>
+
+    <nav class="site-nav" aria-label={dict.nav.sections}>
+      <ul>
+        {sections.map((section) => <li><a href={`#${section.id}`}>{section.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="header-tools">
+      <nav class="lang-switch" aria-label={dict.nav.language}>
+        <ul>
+          {
+            locales.map((locale) => (
+              <li>
+                <a
+                  href={localeUrl(locale)}
+                  lang={locale}
+                  hreflang={locale}
+                  title={dictionaries[locale].langName}
+                  aria-current={locale === lang ? 'true' : undefined}
+                  data-lang-link
+                >
+                  {locale.toUpperCase()}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label={dict.nav.theme} title={dict.nav.theme}>
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2" fill="currentColor"></circle>
+          <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7"></path>
+          </g>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path fill="currentColor" d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1Z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {}
+  });
+</script>

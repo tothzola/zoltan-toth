@@ -1,0 +1,180 @@
+---
+import FlowLink from './FlowLink.astro';
+import { ecosystems } from '../data/ecosystems';
+import { projects } from '../data/projects';
+import { techLabel } from '../data/technologies';
+import type { Dictionary } from '../i18n';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { dict } = Astro.props;
+const copy = dict.technologies;
+---
+
+<section id="technologies" class="section" aria-labelledby="technologies-title">
+  <div class="wrap">
+    <div class="flow-title">
+      <h2 id="technologies-title">{copy.title}</h2>
+      <p class="section-intro">{copy.intro}</p>
+    </div>
+
+    <FlowLink />
+    <!-- The ecosystem buttons are the cases of this switch. -->
+    <div class="flow-decision" data-flow-step aria-hidden="true"><span class="flow-diamond"></span></div>
+
+    <div class="eco-tabs" role="tablist" aria-labelledby="technologies-title">
+      {
+        ecosystems.map((eco, index) => (
+          <a
+            class="eco-tab"
+            role="tab"
+            href={`#eco-${eco.id}`}
+            id={`tab-${eco.id}`}
+            aria-controls={`eco-${eco.id}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            data-eco={eco.id}
+            style={`--eco: var(--eco-${eco.id})`}
+          >
+            <span class="eco-dot" aria-hidden="true" />
+            {copy.ecosystems[eco.id].name}
+            <span class="eco-count" aria-hidden="true">
+              {eco.technologyIds.length}
+            </span>
+          </a>
+        ))
+      }
+    </div>
+
+    {
+      ecosystems.map((eco) => {
+        const built = projects.filter((project) =>
+          project.technologyIds.some((tech) => eco.technologyIds.includes(tech)),
+        );
+        return (
+          <div
+            class="eco-panel"
+            role="tabpanel"
+            id={`eco-${eco.id}`}
+            aria-labelledby={`tab-${eco.id}`}
+            data-eco-panel={eco.id}
+            style={`--eco: var(--eco-${eco.id})`}
+          >
+            <p class="eco-blurb">{copy.ecosystems[eco.id].blurb}</p>
+
+            <div class="eco-columns">
+              <div>
+                <h3>{copy.techHeading}</h3>
+                <ul class="chips">
+                  {eco.technologyIds.map((tech) => (
+                    <li>
+                      <button type="button" class="chip chip-filter" data-tech={tech} aria-pressed="false">
+                        {techLabel(tech, dict)}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <p class="eco-hint">{copy.filterHint}</p>
+              </div>
+
+              <div>
+                <h3>{copy.projectsHeading}</h3>
+                <ul class="eco-projects">
+                  {built.map((project) => (
+                    <li data-techs={project.technologyIds.join(' ')}>
+                      <a href={`#project-${project.id}`}>
+                        <span>{dict.projects.items[project.id].title}</span>
+                        <span class="eco-project-period">{project.period}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p class="eco-empty" hidden={built.length > 0}>
+                  {copy.empty}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+  </div>
+</section>
+
+<script>
+  const root = document.getElementById('technologies');
+
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll<HTMLAnchorElement>('.eco-tab'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('.eco-panel'));
+
+    /** Show only the projects that use `tech`; `null` shows them all. */
+    const filter = (panel: HTMLElement, tech: string | null) => {
+      panel.querySelectorAll<HTMLButtonElement>('.chip-filter').forEach((chip) => {
+        chip.setAttribute('aria-pressed', String(chip.dataset.tech === tech));
+      });
+      let shown = 0;
+      panel.querySelectorAll<HTMLElement>('.eco-projects > li').forEach((item) => {
+        const match = tech === null || (item.dataset.techs ?? '').split(' ').includes(tech);
+        item.hidden = !match;
+        if (match) shown += 1;
+      });
+      const empty = panel.querySelector<HTMLElement>('.eco-empty');
+      if (empty) empty.hidden = shown > 0;
+    };
+
+    const select = (ecoId: string, focus = false) => {
+      tabs.forEach((tab) => {
+        const active = tab.dataset.eco === ecoId;
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
+        if (active && focus) tab.focus();
+      });
+      panels.forEach((panel) => {
+        panel.hidden = panel.dataset.ecoPanel !== ecoId;
+      });
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', (event) => {
+        event.preventDefault();
+        const ecoId = tab.dataset.eco!;
+        const panel = panels.find((candidate) => candidate.dataset.ecoPanel === ecoId);
+        if (panel) filter(panel, null);
+        select(ecoId);
+      });
+      tab.addEventListener('keydown', (event) => {
+        const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+        if (step === 0) return;
+        event.preventDefault();
+        const next = tabs[(index + step + tabs.length) % tabs.length];
+        const panel = panels.find((candidate) => candidate.dataset.ecoPanel === next.dataset.eco);
+        if (panel) filter(panel, null);
+        select(next.dataset.eco!, true);
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('.chip-filter').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const panel = chip.closest<HTMLElement>('.eco-panel');
+        if (!panel) return;
+        const pressed = chip.getAttribute('aria-pressed') === 'true';
+        filter(panel, pressed ? null : (chip.dataset.tech ?? null));
+      });
+    });
+
+    // Technology chips elsewhere on the page jump here with that technology selected.
+    document.querySelectorAll<HTMLAnchorElement>('[data-tech-link]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const tech = link.dataset.techLink!;
+        const panel = panels.find((candidate) => candidate.querySelector(`.chip-filter[data-tech="${tech}"]`));
+        if (!panel) return;
+        select(panel.dataset.ecoPanel!);
+        filter(panel, tech);
+      });
+    });
+
+    if (tabs.length > 0) select(tabs[0].dataset.eco!);
+  }
+</script>

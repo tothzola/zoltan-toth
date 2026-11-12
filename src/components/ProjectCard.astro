@@ -1,0 +1,47 @@
+---
+import TechChip from './TechChip.astro';
+import { ecosystemOf } from '../data/ecosystems';
+import type { Project } from '../data/projects';
+import type { Dictionary } from '../i18n';
+
+interface Props {
+  project: Project;
+  dict: Dictionary;
+  /** 'li' inside the lanes, 'div' for the featured card on the main line. */
+  as?: 'li' | 'div';
+  featured?: boolean;
+}
+
+const { project, dict, as: Tag = 'li', featured = false } = Astro.props;
+const copy = dict.projects;
+const text = copy.items[project.id];
+---
+
+<Tag
+  id={`project-${project.id}`}
+  class:list={['project-card', { 'is-featured': featured }]}
+  style={`--eco: var(--eco-${ecosystemOf(project.technologyIds[0])})`}
+  data-flow-step
+>
+  <p class="project-period">{project.period}</p>
+  <h3>{text.title}</h3>
+  <div class="project-body">
+    <div>
+      <h4>{copy.purposeLabel}</h4>
+      <p>{text.purpose}</p>
+    </div>
+    <div>
+      <h4>{copy.valueLabel}</h4>
+      <p>{text.value}</p>
+    </div>
+  </div>
+  <ul class="chips">
+    {
+      project.technologyIds.map((tech) => (
+        <li>
+          <TechChip tech={tech} dict={dict} />
+        </li>
+      ))
+    }
+  </ul>
+</Tag>

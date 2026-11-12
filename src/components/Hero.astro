@@ -1,0 +1,35 @@
+---
+import RainBackground from './RainBackground.astro';
+import { site } from '../data/site';
+import type { Dictionary } from '../i18n';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { dict } = Astro.props;
+---
+
+<section class="hero">
+  {site.codeRain && <RainBackground />}
+  <div class="wrap">
+    <p class="hero-eyebrow">{dict.hero.eyebrow}</p>
+    <h1 class="hero-name">{dict.name}</h1>
+    <!-- A two-step workflow: the role today, and the one I'm heading for. -->
+    <ol class="hero-path">
+      <li>
+        <span class="hero-path-label">{dict.hero.nowLabel}</span>
+        <span class="hero-role">{dict.hero.role}</span>
+      </li>
+      <li class="hero-path-next">
+        <span class="hero-path-label">{dict.hero.nextLabel}</span>
+        <span class="hero-role hero-role--next">{dict.hero.nextRole}</span>
+      </li>
+    </ol>
+    <p class="hero-tagline">{dict.hero.tagline}</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#projects">{dict.hero.ctaProjects}</a>
+      <a class="btn" href="#contact">{dict.hero.ctaContact}</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,47 @@
+---
+import TechChip from './TechChip.astro';
+import { timeline } from '../data/timeline';
+import type { Dictionary } from '../i18n';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { dict } = Astro.props;
+const roadmap = dict.roadmap;
+---
+
+<section id="roadmap" class="section" aria-labelledby="roadmap-title">
+  <div class="wrap">
+    <div class="flow-title">
+      <h2 id="roadmap-title">{roadmap.title}</h2>
+      <p class="section-intro">{roadmap.intro}</p>
+    </div>
+
+    <div class="flow-steps">
+      <span class="flow-spine" data-flow-v aria-hidden="true"></span>
+      <ol>
+        {
+          timeline.map((stop) => (
+            <li class:list={['flow-step', { 'flow-step--future': stop.future }]} data-flow-step>
+              <div class="flow-step-card">
+                <p class="flow-step-when">{stop.future ? roadmap.next : (stop.when ?? roadmap.early)}</p>
+                <h3>{roadmap.items[stop.id].title}</h3>
+                <p>{roadmap.items[stop.id].text}</p>
+                {stop.technologyIds.length > 0 && (
+                  <ul class="chips">
+                    {stop.technologyIds.map((tech) => (
+                      <li>
+                        <TechChip tech={tech} dict={dict} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>

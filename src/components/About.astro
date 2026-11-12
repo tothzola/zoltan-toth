@@ -1,0 +1,55 @@
+---
+import { site } from '../data/site';
+import { base, type Dictionary } from '../i18n';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { dict } = Astro.props;
+const about = dict.about;
+---
+
+<section id="about" class="section" aria-labelledby="about-title">
+  <div class="wrap">
+    <div class="flow-card about-grid" data-flow-step>
+    <div class="about-photo">
+      {
+        site.photo ? (
+          <img src={`${base}${site.photo}`} alt={about.photoAlt} width="480" height="600" loading="lazy" decoding="async" />
+        ) : (
+          <div class="photo-placeholder" role="img" aria-label={about.photoPlaceholder}>
+            <span class="photo-initials" aria-hidden="true">{site.initials}</span>
+            <span class="photo-caption" aria-hidden="true">{about.photoPlaceholder}</span>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="about-text">
+      <h2 id="about-title">{about.title}</h2>
+      <p class="lead">{about.lead}</p>
+      {about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+
+      <div class="family-card" data-reveal>
+        <div class="family-card-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+        <h3>{about.family.title}</h3>
+        <dl>
+          {
+            about.family.rows.map((row) => (
+              <div>
+                <dt>{row.label}</dt>
+                <dd>{row.value}</dd>
+              </div>
+            ))
+          }
+          <div class="family-status">
+            <dt>{about.family.statusLabel}</dt>
+            <dd><span class="status-dot" aria-hidden="true"></span>{about.family.status}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>

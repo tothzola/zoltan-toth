@@ -1,0 +1,98 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import About from './About.astro';
+import Roadmap from './Roadmap.astro';
+import Projects from './Projects.astro';
+import Technologies from './Technologies.astro';
+import Footer from './Footer.astro';
+import FlowLink from './FlowLink.astro';
+import FlowTerminal from './FlowTerminal.astro';
+import { getDictionary, type Locale } from '../i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const dict = getDictionary(lang);
+---
+
+<Base lang={lang} dict={dict}>
+  <Header lang={lang} dict={dict} />
+  <main id="main">
+    <Hero dict={dict} />
+
+    <!-- Everything between the hero and the closing section is one workflow, read top to bottom. -->
+    <div class="flow" data-flow>
+      <FlowTerminal kind="start" label={dict.flow.start} />
+      <FlowLink />
+      <About dict={dict} />
+      <FlowLink />
+      <Roadmap dict={dict} />
+      <FlowLink />
+      <Projects dict={dict} />
+      <FlowLink />
+      <Technologies dict={dict} />
+      <FlowLink />
+      <FlowTerminal kind="end" label={dict.flow.end} />
+      <FlowLink />
+    </div>
+  </main>
+  <Footer lang={lang} dict={dict} />
+</Base>
+
+<script>
+  // Draws the workflow as the visitor scrolls: connectors fill, a token rides the
+  // main line, and each step lights up when it is reached. With reduced motion
+  // (or without JavaScript) the whole diagram is simply shown as drawn.
+  const flow = document.querySelector<HTMLElement>('[data-flow]');
+
+  if (flow) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const connectors = Array.from(flow.querySelectorAll<HTMLElement>('[data-flow-v]'));
+    const steps = Array.from(flow.querySelectorAll<HTMLElement>('[data-flow-step]'));
+    let queued = false;
+
+    const update = () => {
+      queued = false;
+      // Everything above this line of the window counts as reached.
+      const line = window.innerHeight * 0.72;
+
+      for (const connector of connectors) {
+        const rect = connector.getBoundingClientRect();
+        const fill = Math.min(Math.max((line - rect.top) / rect.height, 0), 1);
+        connector.style.setProperty('--fill', fill.toFixed(4));
+        connector.classList.toggle('is-active', fill > 0 && fill < 1);
+        connector.classList.toggle('is-done', fill >= 1);
+      }
+      for (const step of steps) {
+        step.classList.toggle('is-reached', step.getBoundingClientRect().top < line);
+      }
+    };
+
+    const request = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(update);
+    };
+
+    const apply = () => {
+      const live = !reducedMotion.matches;
+      flow.classList.toggle('flow-live', live);
+      if (live) {
+        update();
+        window.addEventListener('scroll', request, { passive: true });
+        window.addEventListener('resize', request);
+      } else {
+        window.removeEventListener('scroll', request);
+        window.removeEventListener('resize', request);
+        connectors.forEach((connector) => connector.style.removeProperty('--fill'));
+      }
+    };
+
+    apply();
+    reducedMotion.addEventListener('change', apply);
+  }
+</script>

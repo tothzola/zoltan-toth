@@ -1,0 +1,14 @@
+---
+// Code rain behind a section. The parent needs `position: relative` (see flow.css).
+---
+
+<canvas class="rain-bg" data-rain aria-hidden="true"></canvas>
+
+<script>
+  import { mountBackground } from '../scripts/hero-background';
+  import { createRain } from '../scripts/hero-rain';
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-rain]').forEach((canvas) => {
+    mountBackground(canvas, createRain());
+  });
+</script>

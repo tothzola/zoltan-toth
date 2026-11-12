@@ -1,0 +1,488 @@
+/* ---------- Code rain (hero and closing section) ---------- */
+
+.hero,
+.site-footer {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero .wrap,
+.site-footer .wrap {
+  position: relative;
+}
+
+/* The rain fades out towards the workflow in the middle of the page. */
+.rain-bg {
+  --rain-fade: to bottom;
+  --rain-side: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.5));
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(var(--rain-fade), #000 62%, transparent 100%), var(--rain-side);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(var(--rain-fade), #000 62%, transparent 100%), var(--rain-side);
+  mask-composite: intersect;
+}
+
+.site-footer .rain-bg {
+  --rain-fade: to top;
+}
+
+/* On wide screens the rain is weaker where the text sits: on the left in the
+   hero, in the middle in the closing section. */
+@media (min-width: 48rem) {
+  .hero .rain-bg {
+    --rain-side: linear-gradient(to right, rgb(0 0 0 / 0.14) 30%, #000 75%);
+  }
+
+  .site-footer .rain-bg {
+    --rain-side: linear-gradient(to right, #000 5%, rgb(0 0 0 / 0.1) 30%, rgb(0 0 0 / 0.1) 70%, #000 95%);
+  }
+}
+
+/* ---------- Workflow (everything between the hero and the closing section) ---------- */
+
+.flow {
+  --flow-line: color-mix(in srgb, var(--ink) 24%, var(--bg));
+  --flow-active: var(--accent);
+  padding-top: 2.5rem;
+  /* A dotted "designer canvas" behind the diagram. */
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 14%, transparent) 1px, transparent 1.5px);
+  background-size: 24px 24px;
+}
+
+.flow .section {
+  padding-block: 0;
+}
+
+/* Start and End */
+
+.flow-terminal {
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0 auto;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.flow-terminal-dot {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--flow-active);
+  border-radius: 50%;
+  background: var(--surface);
+  transition: border-color 0.4s ease;
+}
+
+.flow-terminal--end .flow-terminal-dot::after {
+  content: '';
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--flow-active);
+  transition: background 0.4s ease;
+}
+
+.flow-terminal-label {
+  position: absolute;
+  left: calc(100% + 0.6rem);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+/* Connectors on the main line */
+
+.flow-link {
+  position: relative;
+  width: 2px;
+  height: 3.25rem;
+  margin: 0.3rem auto;
+  background: var(--flow-line);
+}
+
+.flow-link::before,
+.flow-spine::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(var(--fill, 1) * 100%);
+  background: var(--flow-active);
+}
+
+.flow-arrow {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  margin-left: -6px;
+  border-inline: 6px solid transparent;
+  border-top: 8px solid var(--flow-active);
+  transition: border-color 0.2s ease;
+}
+
+/* Section titles sit on the main line */
+
+.flow-title {
+  max-width: 40rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.flow-title .section-intro {
+  margin: 0.6rem auto 0;
+}
+
+/* A block that is one activity (About me) */
+
+.flow-card {
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1.5px solid color-mix(in srgb, var(--flow-active) 55%, var(--line));
+  border-radius: 1.25rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: border-color 0.5s ease;
+}
+
+/* Roadmap: steps along a spine */
+
+.flow-steps {
+  position: relative;
+  margin-top: 0.75rem;
+  padding-block: 1.75rem 1rem;
+}
+
+.flow-steps ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flow-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 8px;
+  width: 2px;
+  background: var(--flow-line);
+}
+
+.flow-step {
+  position: relative;
+  margin-left: 2.5rem;
+}
+
+.flow-step + .flow-step {
+  margin-top: 1.25rem;
+}
+
+/* The stub from the spine to the step, and the node on the spine. */
+.flow-step::before {
+  content: '';
+  position: absolute;
+  top: 1.9rem;
+  right: 100%;
+  width: calc(2.5rem - 16px);
+  height: 2px;
+  background: var(--flow-active);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+
+.flow-step::after {
+  content: '';
+  position: absolute;
+  top: calc(1.9rem - 6px);
+  left: calc(-2.5rem + 2px);
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--flow-active);
+  border-radius: 50%;
+  background: var(--bg);
+  transition: border-color 0.35s ease;
+}
+
+.flow-step-card {
+  padding: 1.1rem 1.25rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+
+.flow-step-when {
+  margin: 0 0 0.25rem;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.flow-step-card h3 {
+  margin-bottom: 0.4rem;
+  font-size: 1.25rem;
+}
+
+.flow-step-card > p:not(.flow-step-when) {
+  margin-bottom: 0.75rem;
+  color: var(--muted);
+}
+
+.flow-step-card > :last-child {
+  margin-bottom: 0;
+}
+
+/* A step that is still ahead: everything about it is dashed. */
+.flow-step--future .flow-step-card {
+  border: 1.5px dashed color-mix(in srgb, var(--flow-active) 60%, var(--line));
+  background: color-mix(in srgb, var(--surface) 65%, transparent);
+}
+
+.flow-step--future::before {
+  background: repeating-linear-gradient(to right, var(--flow-active) 0 5px, transparent 5px 9px);
+}
+
+.flow-step--future::after {
+  border-width: 2px;
+  border-style: dashed;
+}
+
+/* Wide screens: the spine moves to the centre and steps alternate sides. */
+@media (min-width: 48rem) {
+  .flow-spine {
+    left: 50%;
+    margin-left: -1px;
+  }
+
+  .flow-step {
+    width: calc(50% - 2.75rem);
+    margin-left: 0;
+  }
+
+  .flow-step:nth-child(even) {
+    margin-left: auto;
+  }
+
+  .flow-step + .flow-step {
+    margin-top: -1.5rem;
+  }
+
+  .flow-step::before {
+    width: calc(2.75rem - 7px);
+  }
+
+  .flow-step:nth-child(odd)::before {
+    left: 100%;
+    right: auto;
+    transform-origin: right;
+  }
+
+  .flow-step:nth-child(odd)::after {
+    left: calc(100% + 2.75rem - 7px);
+  }
+
+  .flow-step:nth-child(even)::after {
+    left: auto;
+    right: calc(100% + 2.75rem - 7px);
+  }
+}
+
+/* Decision / switch node */
+
+.flow-decision {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flow-diamond {
+  width: 2rem;
+  height: 2rem;
+  margin: 0.55rem 0;
+  transform: rotate(45deg);
+  border: 2px solid var(--flow-active);
+  border-radius: 5px;
+  background: var(--accent-soft);
+  transition:
+    border-color 0.4s ease,
+    background 0.4s ease;
+}
+
+.flow-decision::after {
+  content: '';
+  width: 2px;
+  height: 0.9rem;
+  background: var(--flow-line);
+}
+
+/* Projects: parallel lanes that split after the decision and merge again */
+
+.flow-lanes {
+  --cols: 1;
+  --lane-gap: 1.5rem;
+  --drop: 2.25rem;
+  --lane-w: calc((100% - (var(--cols) - 1) * var(--lane-gap)) / var(--cols));
+  --lane-line: linear-gradient(var(--flow-line), var(--flow-line));
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: var(--drop) var(--lane-gap);
+  list-style: none;
+  margin: 0;
+  padding: var(--drop) 0;
+  /* One vertical line per lane; the cards sit on top of it. */
+  background: var(--lane-line) 50% 0 / 2px 100% no-repeat;
+}
+
+/* The bars where the lanes split and merge. */
+.flow-lanes::before,
+.flow-lanes::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--lane-w) / 2);
+  right: calc(var(--lane-w) / 2);
+  height: 2px;
+  background: var(--flow-line);
+}
+
+.flow-lanes::before {
+  top: 0;
+}
+
+.flow-lanes::after {
+  bottom: 0;
+}
+
+@media (min-width: 44rem) {
+  .flow-lanes {
+    --cols: 2;
+    background:
+      var(--lane-line) calc(var(--lane-w) / 2 - 1px) 0 / 2px 100% no-repeat,
+      var(--lane-line) calc(var(--lane-w) * 1.5 + var(--lane-gap) - 1px) 0 / 2px 100% no-repeat;
+  }
+}
+
+@media (min-width: 64rem) {
+  .flow-lanes {
+    --cols: 3;
+    background:
+      var(--lane-line) calc(var(--lane-w) / 2 - 1px) 0 / 2px 100% no-repeat,
+      var(--lane-line) 50% 0 / 2px 100% no-repeat,
+      var(--lane-line) calc(var(--lane-w) * 2.5 + var(--lane-gap) * 2 - 1px) 0 / 2px 100% no-repeat;
+  }
+}
+
+.flow .project-card {
+  position: relative;
+  transition:
+    transform 0.45s ease,
+    border-color 0.45s ease;
+}
+
+/* Arrowhead where a lane enters a card. */
+.flow-lanes .project-card::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 3px);
+  margin-left: -6px;
+  border-inline: 6px solid transparent;
+  border-top: 8px solid var(--eco);
+  transition: border-color 0.45s ease;
+}
+
+/* Technologies: the ecosystem buttons are the cases of the switch */
+
+.flow .eco-tabs {
+  justify-content: center;
+}
+
+.flow .eco-panel {
+  box-shadow: var(--shadow);
+}
+
+/* Closing section */
+
+.site-footer .wrap {
+  text-align: center;
+}
+
+.site-footer .section-intro {
+  margin-inline: auto;
+}
+
+.site-footer .contact-list {
+  justify-content: center;
+}
+
+/* ---------- Scroll tracking ----------
+   Without JavaScript, or with reduced motion, the whole diagram is simply drawn.
+   With it, `.flow-live` is set and each part is drawn as the visitor reaches it. */
+
+.flow-live .flow-link:not(.is-done) .flow-arrow {
+  border-top-color: var(--flow-line);
+}
+
+/* The token that travels down the main line. */
+.flow-live .flow-link.is-active::after,
+.flow-live .flow-spine.is-active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(var(--fill) * 100%);
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--flow-active);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--flow-active) 22%, transparent);
+}
+
+.flow-live .flow-terminal:not(.is-reached) .flow-terminal-dot,
+.flow-live .flow-card:not(.is-reached) {
+  border-color: var(--flow-line);
+}
+
+.flow-live .flow-terminal--end:not(.is-reached) .flow-terminal-dot::after {
+  background: var(--flow-line);
+}
+
+.flow-live .flow-step:not(.is-reached)::before {
+  transform: scaleX(0);
+}
+
+.flow-live .flow-step:not(.is-reached)::after {
+  border-color: var(--flow-line);
+}
+
+.flow-live .flow-step:not(.is-reached) .flow-step-card {
+  opacity: 0.45;
+  transform: translateY(10px);
+}
+
+.flow-live .flow-decision:not(.is-reached) .flow-diamond {
+  border-color: var(--flow-line);
+  background: var(--surface);
+}
+
+.flow-live .project-card:not(.is-reached) {
+  border-top-color: var(--flow-line);
+  transform: translateY(10px);
+}
+
+.flow-live .flow-lanes .project-card:not(.is-reached)::before {
+  border-top-color: var(--flow-line);
+}
+
+@media print {
+  .rain-bg {
+    display: none;
+  }
+}

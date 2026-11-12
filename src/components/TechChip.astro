@@ -1,0 +1,16 @@
+---
+import { ecosystemOf } from '../data/ecosystems';
+import { techLabel, type TechId } from '../data/technologies';
+import type { Dictionary } from '../i18n';
+
+interface Props {
+  tech: TechId;
+  dict: Dictionary;
+}
+
+const { tech, dict } = Astro.props;
+---
+
+<a class="chip" href="#technologies" data-tech-link={tech} style={`--eco: var(--eco-${ecosystemOf(tech)})`}>
+  {techLabel(tech, dict)}
+</a>
