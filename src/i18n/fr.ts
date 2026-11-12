@@ -226,6 +226,7 @@ export const fr: Dictionary = {
     linkedin: 'LinkedIn',
     github: 'GitHub',
     email: 'E-mail',
+    newTab: 's’ouvre dans un nouvel onglet',
     placeholder: 'Lien à venir',
     built: 'Construit avec Astro. Sans cookies, sans traceurs.',
     updated: 'Dernière mise à jour',

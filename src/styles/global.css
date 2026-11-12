@@ -303,6 +303,24 @@ html:not(.js) .theme-toggle {
     transform 0.15s ease;
 }
 
+.btn-icon {
+  margin-left: 0.35em;
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 a.btn:hover {
   background: var(--ink);
   color: var(--bg);

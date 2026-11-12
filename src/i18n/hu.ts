@@ -226,6 +226,7 @@ export const hu: Dictionary = {
     linkedin: 'LinkedIn',
     github: 'GitHub',
     email: 'E-mail',
+    newTab: 'új lapon nyílik meg',
     placeholder: 'A link hamarosan érkezik',
     built: 'Astróval készült. Sütik és követés nélkül.',
     updated: 'Utoljára frissítve',

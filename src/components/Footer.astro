@@ -11,9 +11,9 @@ interface Props {
 const { lang, dict } = Astro.props;
 const footer = dict.footer;
 const contacts = [
-  { label: footer.linkedin, href: site.links.linkedin },
-  { label: footer.github, href: site.links.github },
-  { label: footer.email, href: site.links.email ? `mailto:${site.links.email}` : '' },
+  { label: footer.linkedin, href: site.links.linkedin, external: true },
+  { label: footer.github, href: site.links.github, external: true },
+  { label: footer.email, href: site.links.email ? `mailto:${site.links.email}` : '', external: false },
 ];
 const updated = new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }).format(new Date());
 ---
@@ -29,9 +29,17 @@ const updated = new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }
         contacts.map((contact) => (
           <li>
             {contact.href ? (
-              <a class="btn" href={contact.href} rel="me noopener">
-                {contact.label}
-              </a>
+              contact.external ? (
+                <a class="btn" href={contact.href} target="_blank" rel="me noopener noreferrer">
+                  {contact.label}
+                  <span class="btn-icon" aria-hidden="true">↗</span>
+                  <span class="sr-only">{` (${footer.newTab})`}</span>
+                </a>
+              ) : (
+                <a class="btn" href={contact.href} rel="me">
+                  {contact.label}
+                </a>
+              )
             ) : (
               <span class="btn is-placeholder" title={footer.placeholder}>
                 {contact.label}
